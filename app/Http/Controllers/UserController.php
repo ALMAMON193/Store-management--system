@@ -126,17 +126,16 @@ class UserController extends Controller
             $email = $request->header('email');
             $password = $request->input('password');
 
-            // Hash the new password
-            $hashedPassword = Hash::make($password);
 
             // Update the password in the database
-            User::where('email', '=', $email)->update(['password' => $hashedPassword]);
+            User::where('email', '=', $email)->update(['password' => $password]);
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'Password reset successful',
+                $password
             ], 200);
-        } catch (Exception $exception) {
+        } catch (Exception $e) {
             return response()->json([
                 'status' => 'fail',
                 'message' => 'Something went wrong',
