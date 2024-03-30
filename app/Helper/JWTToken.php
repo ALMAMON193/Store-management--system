@@ -14,7 +14,8 @@ class JWTToken
       'iss' => "laravel-token",
       'iat' => time(),
       'userEmail' => $userEmail,
-      'exp' => time() + 3600
+      'exp' => time() + 3600,
+
 
     );
     return JWT::encode($payload, $key, 'HS256');
@@ -31,12 +32,16 @@ class JWTToken
       'userEmail' => $userEmail,
       'exp' => time() + 60 * 20,
 
+
     );
     return JWT::encode($payload, $key, 'HS256');
   }
 
-  public static function VerifyToken($token): string
+  public static function VerifyToken($token): string|object
   {
+    if ($token === null) {
+      return 'unauthorized';
+    }
 
     try {
       $key = env('JWT_SECRET');

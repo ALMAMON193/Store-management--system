@@ -14,6 +14,39 @@ use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
 {
+
+
+    function LoginPage()
+    {
+        return view('pages.auth.login-page');
+    }
+
+    function RegistrationPage()
+    {
+        return view('pages.auth.registration-page');
+    }
+    function SendOtpPage()
+    {
+        return view('pages.auth.send-otp-page');
+    }
+    function VerifyOTPPage()
+    {
+        return view('pages.auth.verify-otp-page');
+    }
+
+    function ResetPasswordPage()
+    {
+        return view('pages.auth.reset-pass-page');
+    }
+
+    function ProfilePage()
+
+    {
+        return view('pages.dashboard.profile-page');
+    }
+
+
+
     function UserRegistration(Request $request)
     {
         // User::create($request->all());
@@ -62,7 +95,7 @@ class UserController extends Controller
                 'message' => 'User login successfully',
                 'token' => $token
 
-            ], 200);
+            ], 200)->cookie('token', $token, 60 * 60 * 24 * 7);
         } else {
 
             return response()->json([
@@ -112,34 +145,74 @@ class UserController extends Controller
                 'status' => 'success',
                 'message' => 'OTP Verification Successful',
                 'token' => $token
-            ], 200);
+
+            ], 200)->cookie('token', $token, 60 * 60 * 24 * 7);
         } else {
             return response()->json([
                 'status' => 'failed',
-                'message' => 'unauthorized'
+                'message' => 'unauthorized',
+
             ], 200);
         }
     }
+
     function ResetPassword(Request $request)
     {
         try {
             $email = $request->header('email');
             $password = $request->input('password');
-
-
-            // Update the password in the database
             User::where('email', '=', $email)->update(['password' => $password]);
-
             return response()->json([
                 'status' => 'success',
-                'message' => 'Password reset successful',
-                $password
+                'message' => 'Request Successful',
             ], 200);
-        } catch (Exception $e) {
+        } catch (Exception $exception) {
             return response()->json([
                 'status' => 'fail',
-                'message' => 'Something went wrong',
-            ], 500);
+                'message' => 'Something Went Wrong',
+            ], 200);
+        }
+    }
+    function UserLogout()
+    {
+        return redirect('/')->cookie('token', '', -1);
+    }
+
+
+    function UserProfile(Request $request)
+    {
+        $email = $request->header('email');
+        $user = User::where('email', '=', $email)->first();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Request Successful',
+            'data' => $user
+        ], 200);
+    }
+
+    function UpdateProfile(Request $request)
+    {
+        try {
+            $email = $request->header('email');
+            $firstName = $request->input('firstName');
+            $lastName = $request->input('lastName');
+            $mobile = $request->input('mobile');
+            $password = $request->input('password');
+            User::where('email', '=', $email)->update([
+                'firstName' => $firstName,
+                'lastName' => $lastName,
+                'mobile' => $mobile,
+                'password' => $password
+            ]);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Request Successful',
+            ], 200);
+        } catch (Exception $exception) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Something Went Wrong',
+            ], 200);
         }
     }
 }
