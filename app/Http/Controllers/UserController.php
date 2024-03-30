@@ -85,15 +85,15 @@ class UserController extends Controller
     function UserLogin(Request $request)
     {
         $count =
-            User::where('email', $request->input('email'))->where('password', $request->input('password'))->count();
+            User::where('email', $request->input('email'))->where('password', $request->input('password'))->select('id')->first();
 
-        if ($count == 1) {
+        if ($count !== null) {
             //token issue
-            $token = JWTToken::generateToken($request->input('email'));
+            $token = JWTToken::generateToken($request->input('email'), $count->id);
             return  response()->json([
                 'status' => 'success',
                 'message' => 'User login successfully',
-                'token' => $token
+
 
             ], 200)->cookie('token', $token, 60 * 60 * 24 * 7);
         } else {

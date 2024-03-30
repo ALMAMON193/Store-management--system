@@ -17,14 +17,15 @@ class TokenVerificationMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $token = $request->cookie('token');
+
         $result = JWTToken::VerifyToken($token);
-        if ($result == false) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Invalid token'
-            ], 401);
+        if ($result === 'unauthorized') {
+            // Token is invalid or missing, redirect to login page
+            return redirect('/userLogin');
         } else {
-            $request->headers->set('email', $result);
+            // Token is valid, set email header and proceed with the request
+            $request->headers->set('email', $result->userEmail);
+            $request->headers->set('id', $result->userID);
             return $next($request);
         }
     }
