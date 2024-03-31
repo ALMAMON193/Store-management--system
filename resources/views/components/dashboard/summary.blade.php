@@ -160,6 +160,17 @@
                     </div>
                 </div>
             </div>
+            <div class="row">
+
+                <div class="col-6">
+                    @include('components.customer.customer-list')
+                </div>
+                <div class="col-6">
+                    @include('components.product.product-list')
+                </div>
+
+            </div>
+
 
         </div>
     </div>
